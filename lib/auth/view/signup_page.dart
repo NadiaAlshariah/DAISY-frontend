@@ -1,9 +1,52 @@
+import 'package:daisy_frontend/widgets/password_input_field.dart';
 import 'package:flutter/material.dart';
 import '/constants/app_colors.dart';
-import '/auth/view/login_page.dart';
+import 'package:daisy_frontend/auth/service/auth_service.dart';
+import 'package:daisy_frontend/widgets/auth_input_field.dart';
+import 'package:daisy_frontend/widgets/input_error.dart';
+import 'package:daisy_frontend/auth/view/login_page.dart';
 
-class SignupPage extends StatelessWidget {
+class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
+
+  @override
+  State<SignupPage> createState() => _SignupPageState();
+}
+
+class _SignupPageState extends State<SignupPage> {
+  final emailController = TextEditingController();
+  final usernameController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
+
+  String? errorMessage;
+  bool isLoading = false;
+
+  void _signup() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+
+    try {
+      await AuthService.signup(
+        email: emailController.text.trim(),
+        username: usernameController.text.trim(),
+        password: passwordController.text,
+        confirmPassword: confirmPasswordController.text,
+      );
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/home');
+    } catch (e) {
+      setState(() {
+        errorMessage = e.toString().replaceFirst('Exception: ', '');
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,10 +56,10 @@ class SignupPage extends StatelessWidget {
         top: false,
         bottom: false,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: ListView(
             children: [
-              SizedBox(height: 24.0),
+              const SizedBox(height: 24.0),
               Center(
                 child: Image.asset(
                   "assets/images/logo.png",
@@ -34,118 +77,77 @@ class SignupPage extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 30.0),
-              Container(
-                height: 56.0,
-                decoration: BoxDecoration(
-                  color: AppColors.input,
-                  borderRadius: BorderRadius.circular(24.0),
-                ),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Username',
-                    hintStyle: TextStyle(
-                      color: AppColors.secondary,
-                      fontSize: 16.0,
-                    ),
-                    prefixIcon: Icon(Icons.person, color: AppColors.icon),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.all(16.0),
-                  ),
-                ),
+              const SizedBox(height: 8.0),
+
+              if (errorMessage != null) InputError(message: errorMessage!),
+
+              AuthInputField(
+                controller: usernameController,
+                hintText: 'Username',
+                icon: Icons.person,
               ),
-              SizedBox(height: 16.0),
-              Container(
-                height: 56.0,
-                decoration: BoxDecoration(
-                  color: AppColors.input,
-                  borderRadius: BorderRadius.circular(24.0),
-                ),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Email',
-                    hintStyle: TextStyle(
-                      color: AppColors.secondary,
-                      fontSize: 16.0,
-                    ),
-                    prefixIcon: Icon(Icons.email, color: AppColors.icon),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.all(16.0),
-                  ),
-                ),
+              const SizedBox(height: 16.0),
+
+              AuthInputField(
+                controller: emailController,
+                hintText: 'Email',
+                icon: Icons.email,
               ),
-              SizedBox(height: 16.0),
-              Container(
-                height: 56.0,
-                decoration: BoxDecoration(
-                  color: AppColors.input,
-                  borderRadius: BorderRadius.circular(24.0),
-                ),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Password',
-                    hintStyle: TextStyle(
-                      color: AppColors.secondary,
-                      fontSize: 16.0,
-                    ),
-                    prefixIcon: Icon(Icons.lock, color: AppColors.icon),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.all(16.0),
-                  ),
-                ),
+              const SizedBox(height: 16.0),
+
+              PasswordInputField(
+                controller: passwordController,
+                hintText: 'Password',
+                icon: Icons.lock,
               ),
-              SizedBox(height: 16.0),
-              Container(
-                height: 56.0,
-                decoration: BoxDecoration(
-                  color: AppColors.input,
-                  borderRadius: BorderRadius.circular(24.0),
-                ),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Confirm Password',
-                    hintStyle: TextStyle(
-                      color: AppColors.secondary,
-                      fontSize: 16.0,
-                    ),
-                    prefixIcon: Icon(Icons.lock, color: AppColors.icon),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.all(16.0),
-                  ),
-                ),
+              const SizedBox(height: 16.0),
+
+              PasswordInputField(
+                controller: confirmPasswordController,
+                hintText: 'Confirm Password',
+                icon: Icons.lock,
               ),
-              SizedBox(height: 32.0),
+              const SizedBox(height: 24.0),
+
               SizedBox(
                 height: 56.0,
                 child: ElevatedButton(
-                  onPressed: () => {},
+                  onPressed: isLoading ? null : _signup,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),
                   ),
-                  child: Text(
-                    'Sign Up',
-                    style: TextStyle(color: Colors.white, fontSize: 16.0),
-                  ),
+                  child:
+                      isLoading
+                          ? const CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                          )
+                          : const Text(
+                            'Sign Up',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.0,
+                            ),
+                          ),
                 ),
               ),
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Already have an account?'),
+                  const Text('Already have an account?'),
                   TextButton(
                     onPressed:
-                        () => {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const LoginPage(),
-                            ),
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginPage(),
                           ),
-                        },
+                        ),
                     child: Text(
                       'Login',
                       style: TextStyle(
