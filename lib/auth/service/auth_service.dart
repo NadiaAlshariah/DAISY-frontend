@@ -1,27 +1,16 @@
 import 'dart:convert';
 import 'dart:async';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:daisy_frontend/util/http_helper.dart';
 
 class AuthService {
-  static const String baseUrl = 'http://192.168.1.13:5000';
-
-  // Login and store token
   static Future<void> login(String emailOrUsername, String password) async {
-    final url = Uri.parse('$baseUrl/auth/login');
-
     try {
-      final response = await http
-          .post(
-            url,
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              'email_or_username': emailOrUsername,
-              'password': password,
-            }),
-          )
-          .timeout(const Duration(seconds: 10));
+      final response = await HttpHelper.post(
+        '/auth/login',
+        body: {'email_or_username': emailOrUsername, 'password': password},
+      ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -47,8 +36,6 @@ class AuthService {
     required String password,
     required String confirmPassword,
   }) async {
-    final url = Uri.parse('$baseUrl/auth/register');
-
     _validateSignupInput(
       email: email,
       username: username,
@@ -57,19 +44,12 @@ class AuthService {
     );
 
     try {
-      final response = await http
-          .post(
-            url,
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              'email': email,
-              'username': username,
-              'password': password,
-            }),
-          )
-          .timeout(const Duration(seconds: 10));
+      final response = await HttpHelper.post(
+        '/auth/register',
+        body: {'email': email, 'username': username, 'password': password},
+      ).timeout(const Duration(seconds: 10));
 
-      if (response.statusCode == 201 || response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
         final token = data['access_token'];
 
