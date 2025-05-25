@@ -1,9 +1,8 @@
-import 'package:daisy_frontend/widgets/password_input_field.dart';
 import 'package:flutter/material.dart';
-import '/constants/app_colors.dart';
-import 'package:daisy_frontend/auth/service/auth_service.dart';
+import 'package:daisy_frontend/widgets/password_input_field.dart';
 import 'package:daisy_frontend/widgets/auth_input_field.dart';
 import 'package:daisy_frontend/widgets/input_error.dart';
+import 'package:daisy_frontend/auth/service/auth_service.dart';
 import 'package:daisy_frontend/auth/view/login_page.dart';
 
 class SignupPage extends StatefulWidget {
@@ -50,8 +49,10 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.colorScheme.background,
       body: SafeArea(
         top: false,
         bottom: false,
@@ -70,16 +71,16 @@ class _SignupPageState extends State<SignupPage> {
               ),
               Text(
                 'Create New Account',
-                style: TextStyle(
+                style: theme.textTheme.titleLarge?.copyWith(
                   fontSize: 32.0,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
+                  color: theme.colorScheme.primary,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8.0),
 
               if (errorMessage != null) InputError(message: errorMessage!),
+              const SizedBox(height: 16.0),
 
               AuthInputField(
                 controller: usernameController,
@@ -114,7 +115,7 @@ class _SignupPageState extends State<SignupPage> {
                 child: ElevatedButton(
                   onPressed: isLoading ? null : _signup,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: theme.colorScheme.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),
@@ -151,7 +152,7 @@ class _SignupPageState extends State<SignupPage> {
                     child: Text(
                       'Login',
                       style: TextStyle(
-                        color: AppColors.primary,
+                        color: theme.colorScheme.primary,
                         fontWeight: FontWeight.bold,
                         decoration: TextDecoration.underline,
                       ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '/constants/app_colors.dart';
 
 class AuthInputField extends StatelessWidget {
   final TextEditingController controller;
@@ -17,10 +16,12 @@ class AuthInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
       height: 56.0,
       decoration: BoxDecoration(
-        color: AppColors.input,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(24.0),
       ),
       child: TextField(
@@ -28,8 +29,11 @@ class AuthInputField extends StatelessWidget {
         obscureText: obscureText,
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: TextStyle(color: AppColors.secondary, fontSize: 16.0),
-          prefixIcon: Icon(icon, color: AppColors.icon),
+          hintStyle: TextStyle(
+            color: theme.colorScheme.secondary,
+            fontSize: 16.0,
+          ),
+          prefixIcon: Icon(icon, color: theme.iconTheme.color),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.all(16.0),
         ),

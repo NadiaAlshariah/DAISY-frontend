@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '/constants/app_colors.dart';
 
 class PasswordInputField extends StatefulWidget {
   final TextEditingController controller;
@@ -22,10 +21,12 @@ class _PasswordInputFieldState extends State<PasswordInputField> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
       height: 56.0,
       decoration: BoxDecoration(
-        color: AppColors.input,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(24.0),
       ),
       child: TextField(
@@ -33,12 +34,15 @@ class _PasswordInputFieldState extends State<PasswordInputField> {
         obscureText: _obscureText,
         decoration: InputDecoration(
           hintText: widget.hintText,
-          hintStyle: TextStyle(color: AppColors.secondary, fontSize: 16.0),
-          prefixIcon: Icon(widget.icon, color: AppColors.icon),
+          hintStyle: TextStyle(
+            color: theme.colorScheme.secondary,
+            fontSize: 16.0,
+          ),
+          prefixIcon: Icon(widget.icon, color: theme.iconTheme.color),
           suffixIcon: IconButton(
             icon: Icon(
               _obscureText ? Icons.visibility_off : Icons.visibility,
-              color: AppColors.icon,
+              color: theme.iconTheme.color,
             ),
             onPressed: () {
               setState(() {

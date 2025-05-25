@@ -1,6 +1,5 @@
 import 'package:daisy_frontend/widgets/password_input_field.dart';
 import 'package:flutter/material.dart';
-import '/constants/app_colors.dart';
 import '/auth/view/signup_page.dart';
 import 'package:daisy_frontend/auth/service/auth_service.dart';
 import 'package:daisy_frontend/widgets/auth_input_field.dart';
@@ -43,8 +42,10 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.colorScheme.background,
       body: SafeArea(
         top: false,
         bottom: false,
@@ -63,20 +64,17 @@ class _LoginPageState extends State<LoginPage> {
               ),
               Text(
                 'Welcome Back',
-                style: TextStyle(
-                  fontSize: 32.0,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontSize: 32,
+                  color: theme.colorScheme.primary,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8.0),
               Text(
                 'Login to your account',
-                style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.normal,
-                  color: AppColors.secondary,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.secondary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -101,11 +99,11 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 8.0),
               Center(
                 child: TextButton(
-                  onPressed: () => {},
+                  onPressed: () {},
                   child: Text(
                     'Forgot Password?',
                     style: TextStyle(
-                      color: AppColors.primary,
+                      color: theme.colorScheme.primary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -117,7 +115,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: ElevatedButton(
                   onPressed: isLoading ? null : _login,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: theme.colorScheme.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),
@@ -154,7 +152,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: Text(
                       'Sign Up',
                       style: TextStyle(
-                        color: AppColors.primary,
+                        color: theme.colorScheme.primary,
                         fontWeight: FontWeight.bold,
                         decoration: TextDecoration.underline,
                       ),

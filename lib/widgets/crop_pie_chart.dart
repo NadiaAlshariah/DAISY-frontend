@@ -13,6 +13,7 @@ class CropPieChart extends StatefulWidget {
 
 class _CropPieChartState extends State<CropPieChart> {
   late Future<Map<String, dynamic>> _cropData;
+  bool _showDetails = false;
 
   @override
   void initState() {
@@ -66,6 +67,89 @@ class _CropPieChartState extends State<CropPieChart> {
                 showChartValues: true,
               ),
             ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Total Blocks: $total',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _showDetails = !_showDetails;
+                    });
+                  },
+                  child: Text(
+                    _showDetails ? 'Hide Details' : 'Show More Details',
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ),
+              ],
+            ),
+            if (_showDetails) ...[
+              const SizedBox(height: 8),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade300),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 16,
+                      ),
+                      color: Colors.grey.shade200,
+                      child: Row(
+                        children: const [
+                          Expanded(
+                            flex: 5,
+                            child: Text(
+                              'Crop',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 3,
+                            child: Text(
+                              'Count',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ...chartData.entries.map((entry) {
+                      final crop = entry.key;
+                      final count = entry.value.toInt();
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            top: BorderSide(color: Colors.grey.shade300),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(flex: 5, child: Text(crop)),
+                            Expanded(flex: 3, child: Text('$count')),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ],
+                ),
+              ),
+            ],
           ],
         );
       },

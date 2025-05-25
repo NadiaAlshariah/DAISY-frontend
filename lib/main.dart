@@ -3,6 +3,7 @@ import 'auth/view/login_page.dart';
 import 'views/home_page.dart';
 import 'auth/service/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'theme/app_light_theme.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'DAISY',
+      theme: AppLightTheme.theme,
       home: FutureBuilder<Widget>(
         future: getInitialPage(),
         builder: (context, snapshot) {

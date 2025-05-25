@@ -4,7 +4,7 @@ import 'package:daisy_frontend/widgets/create_land_dialog.dart';
 import 'package:daisy_frontend/widgets/show_confirm_dialog.dart';
 import 'package:daisy_frontend/views/block_page.dart';
 import 'package:daisy_frontend/widgets/crop_pie_chart.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:daisy_frontend/widgets/weather_card.dart';
 
 class LandDetailsPage extends StatelessWidget {
   final Map<String, dynamic> land;
@@ -13,8 +13,6 @@ class LandDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double cardWidth = (MediaQuery.of(context).size.width - 56) / 2;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Land Details'),
@@ -56,47 +54,7 @@ class LandDetailsPage extends StatelessWidget {
                 }
 
                 final weather = snapshot.data!;
-                return Column(
-                  children: [
-                    Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: [
-                        _dashboardItem(
-                          'Temp (°C)',
-                          weather['temperature_c'],
-                          Icons.thermostat,
-                          cardWidth,
-                        ),
-                        _dashboardItem(
-                          'Humidity (%)',
-                          weather['humidity'],
-                          Icons.water_drop,
-                          cardWidth,
-                        ),
-                        _dashboardItem(
-                          'Wind (m/s)',
-                          weather['wind_ms'],
-                          Icons.air,
-                          cardWidth,
-                        ),
-                        _dashboardItem(
-                          'Precip. (mm)',
-                          weather['precip_mm'],
-                          Icons.grain,
-                          cardWidth,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    _dashboardItem(
-                      'Evapotranspiration',
-                      weather['evapotranspiration'],
-                      CupertinoIcons.cloud_rain,
-                      MediaQuery.of(context).size.width - 40,
-                    ),
-                  ],
-                );
+                return WeatherCard(weather: weather);
               },
             ),
             const SizedBox(height: 30),
@@ -158,55 +116,6 @@ class LandDetailsPage extends StatelessWidget {
       child: ListTile(
         title: Text(label),
         subtitle: Text(value?.toString() ?? '--'),
-      ),
-    );
-  }
-
-  Widget _dashboardItem(
-    String label,
-    dynamic value,
-    IconData icon,
-    double width,
-  ) {
-    return Container(
-      width: width,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.blue.shade50,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(2, 2)),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 24, color: Colors.blueGrey),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black54,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  value?.toString() ?? '--',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

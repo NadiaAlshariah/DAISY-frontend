@@ -8,6 +8,9 @@ class LandCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final latitude = land['latitude'];
+    final longitude = land['longitude'];
+
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
@@ -18,7 +21,7 @@ class LandCard extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
         subtitle: Text(
-          'Lat: ${land['latitude']} | Lng: ${land['longitude']}',
+          'Lat: ${_formatCoord(latitude)} | Lng: ${_formatCoord(longitude)}',
           style: const TextStyle(fontSize: 13),
         ),
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
@@ -30,5 +33,12 @@ class LandCard extends StatelessWidget {
         },
       ),
     );
+  }
+
+  String _formatCoord(dynamic value) {
+    if (value is num) {
+      return value.toStringAsFixed(4);
+    }
+    return '--';
   }
 }
