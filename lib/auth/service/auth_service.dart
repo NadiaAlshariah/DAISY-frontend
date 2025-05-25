@@ -1,27 +1,16 @@
 import 'dart:convert';
 import 'dart:async';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:daisy_frontend/util/http_helper.dart';
 
 class AuthService {
-  static const String baseUrl = 'http://192.168.1.13:5000';
-
-  // Login and store token
   static Future<void> login(String emailOrUsername, String password) async {
-    final url = Uri.parse('$baseUrl/auth/login');
-
     try {
-      final response = await http
-          .post(
-            url,
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              'email_or_username': emailOrUsername,
-              'password': password,
-            }),
-          )
-          .timeout(const Duration(seconds: 10));
+      final response = await HttpHelper.post(
+        '/auth/login',
+        body: {'email_or_username': emailOrUsername, 'password': password},
+      ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -47,8 +36,6 @@ class AuthService {
     required String password,
     required String confirmPassword,
   }) async {
-    final url = Uri.parse('$baseUrl/auth/register');
-
     _validateSignupInput(
       email: email,
       username: username,
@@ -57,19 +44,12 @@ class AuthService {
     );
 
     try {
-      final response = await http
-          .post(
-            url,
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              'email': email,
-              'username': username,
-              'password': password,
-            }),
-          )
-          .timeout(const Duration(seconds: 10));
+      final response = await HttpHelper.post(
+        '/auth/register',
+        body: {'email': email, 'username': username, 'password': password},
+      ).timeout(const Duration(seconds: 10));
 
-      if (response.statusCode == 201 || response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
         final token = data['access_token'];
 
@@ -78,6 +58,36 @@ class AuthService {
       } else {
         final errorData = jsonDecode(response.body);
         final error = errorData['error'] ?? 'Signup failed';
+        throw Exception(error);
+      }
+    } on TimeoutException {
+      throw Exception('Request timed out. Please check your internet.');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<void> changePassword(
+    String currentPassword,
+    String newPassword,
+    String confirmPassword,
+  ) async {
+    try {
+      _validatePassword(newPassword, confirmPassword: currentPassword);
+      final response = await HttpHelper.post(
+        '/auth/change-password',
+        body: {
+          'current_password': currentPassword,
+          'new_password': newPassword,
+        },
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) {
+        final errorData = jsonDecode(response.body);
+        final error =
+            errorData['message'] ??
+            errorData['error'] ??
+            'Failed to change password';
         throw Exception(error);
       }
     } on TimeoutException {
@@ -138,12 +148,17 @@ class AuthService {
       throw Exception('Please enter a valid email address');
     }
 
-    if (username.length < 3 || username.contains(' ')) {
+    final usernameRegex = RegExp(r'^[a-zA-Z0-9_]{3,}$');
+    if (!usernameRegex.hasMatch(username)) {
       throw Exception(
-        'Username must be at least 3 characters and contain no spaces',
+        'Username must be at least 3 characters and contain only letters, digits, or underscores',
       );
     }
 
+    _validatePassword(password, confirmPassword: confirmPassword);
+  }
+
+  static void _validatePassword(String password, {String? confirmPassword}) {
     if (password.length < 8) {
       throw Exception('Password must be at least 8 characters long');
     }
@@ -166,7 +181,7 @@ class AuthService {
       throw Exception('Password must contain at least one special character');
     }
 
-    if (password != confirmPassword) {
+    if (confirmPassword != null && password != confirmPassword) {
       throw Exception('Passwords do not match');
     }
   }
