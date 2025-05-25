@@ -67,6 +67,36 @@ class AuthService {
     }
   }
 
+  static Future<void> changePassword(
+    String currentPassword,
+    String newPassword,
+    String confirmPassword,
+  ) async {
+    try {
+      _validatePassword(newPassword, confirmPassword: currentPassword);
+      final response = await HttpHelper.post(
+        '/auth/change-password',
+        body: {
+          'current_password': currentPassword,
+          'new_password': newPassword,
+        },
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) {
+        final errorData = jsonDecode(response.body);
+        final error =
+            errorData['message'] ??
+            errorData['error'] ??
+            'Failed to change password';
+        throw Exception(error);
+      }
+    } on TimeoutException {
+      throw Exception('Request timed out. Please check your internet.');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   static Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('jwt_token');
@@ -118,12 +148,17 @@ class AuthService {
       throw Exception('Please enter a valid email address');
     }
 
-    if (username.length < 3 || username.contains(' ')) {
+    final usernameRegex = RegExp(r'^[a-zA-Z0-9_]{3,}$');
+    if (!usernameRegex.hasMatch(username)) {
       throw Exception(
-        'Username must be at least 3 characters and contain no spaces',
+        'Username must be at least 3 characters and contain only letters, digits, or underscores',
       );
     }
 
+    _validatePassword(password, confirmPassword: confirmPassword);
+  }
+
+  static void _validatePassword(String password, {String? confirmPassword}) {
     if (password.length < 8) {
       throw Exception('Password must be at least 8 characters long');
     }
@@ -146,7 +181,7 @@ class AuthService {
       throw Exception('Password must contain at least one special character');
     }
 
-    if (password != confirmPassword) {
+    if (confirmPassword != null && password != confirmPassword) {
       throw Exception('Passwords do not match');
     }
   }

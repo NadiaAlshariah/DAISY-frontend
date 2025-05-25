@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:daisy_frontend/services/block_service.dart';
+import 'package:daisy_frontend/widgets/create_block_dialog.dart';
 
 class BlocksPage extends StatefulWidget {
   final String landId;
@@ -20,45 +21,9 @@ class _BlocksPageState extends State<BlocksPage> {
   }
 
   Future<void> _handleAddBlock() async {
-    final typeController = TextEditingController();
-    final areaController = TextEditingController();
-
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder:
-          (_) => AlertDialog(
-            title: const Text("Add New Block"),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: typeController,
-                  decoration: const InputDecoration(labelText: "Type"),
-                ),
-                TextField(
-                  controller: areaController,
-                  decoration: const InputDecoration(labelText: "Area (m²)"),
-                  keyboardType: TextInputType.number,
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("Cancel"),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  final data = {
-                    "type": typeController.text.trim(),
-                    "area": double.tryParse(areaController.text) ?? 0.0,
-                  };
-                  Navigator.pop(context, data);
-                },
-                child: const Text("Create"),
-              ),
-            ],
-          ),
+      builder: (_) => CreateBlockDialog(landId: widget.landId),
     );
 
     if (result != null) {

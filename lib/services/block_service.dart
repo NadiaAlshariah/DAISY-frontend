@@ -54,13 +54,20 @@ class BlockService {
     }
   }
 
-  static Future<Map<String, dynamic>> getCropDistribution() async {
-    final response = await HttpHelper.get('/lands/crop-distribution');
+  static Future<Map<String, dynamic>> getCropDistribution({
+    String? landId,
+  }) async {
+    final endpoint =
+        landId == null
+            ? '/lands/crop-distribution'
+            : '/lands/$landId/blocks/crop-distribution';
+
+    final response = await HttpHelper.get(endpoint);
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body) as Map<String, dynamic>;
     } else {
-      final error = jsonDecode(response.body)['error'];
+      final error = jsonDecode(response.body)['error'] ?? 'Unknown error';
       throw Exception('Error: $error');
     }
   }

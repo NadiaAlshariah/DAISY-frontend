@@ -45,4 +45,16 @@ class LandsService {
       throw Exception('Failed to edit land');
     }
   }
+
+  static Future<Map<String, dynamic>> getLiveWeatherForLand(
+    String landId,
+  ) async {
+    final response = await HttpHelper.get('/lands/$landId/weather');
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to fetch weather data');
+    }
+  }
 }
