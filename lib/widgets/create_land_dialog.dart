@@ -40,20 +40,9 @@ class _CreateLandDialogState extends State<CreateLandDialog> {
   final MapController _mapController = MapController();
 
   static const regionOptions = [
-    "Desert",
-    "Drylands",
-    "Sahara",
-    "Steppe",
-    "Semi Dry",
-    "Plateau",
-    "Forest",
-    "Grassland",
-    "Tropical",
-    "Coastal",
-    "Rainforest",
-    "Wetland",
-    "River Basin",
-    "Mountain",
+    "Desert", "Drylands", "Sahara", "Steppe", "Semi Dry", "Plateau",
+    "Forest", "Grassland", "Tropical", "Coastal", "Rainforest", "Wetland",
+    "River Basin", "Mountain",
   ];
 
   @override
@@ -132,38 +121,31 @@ class _CreateLandDialogState extends State<CreateLandDialog> {
                 TextFormField(
                   controller: _nameController,
                   decoration: const InputDecoration(labelText: "Land Name"),
-                  validator:
-                      (value) =>
-                          value == null || value.isEmpty
-                              ? 'Enter land name'
-                              : null,
+                  validator: (value) =>
+                      value == null || value.isEmpty ? 'Enter land name' : null,
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   value: selectedRegion,
-                  items:
-                      regionOptions
-                          .map(
-                            (region) => DropdownMenuItem(
-                              value: region,
-                              child: Text(region),
-                            ),
-                          )
-                          .toList(),
+                  items: regionOptions
+                      .map((region) => DropdownMenuItem(
+                            value: region,
+                            child: Text(region),
+                          ))
+                      .toList(),
                   onChanged: (value) => setState(() => selectedRegion = value),
                   decoration: const InputDecoration(labelText: "Region"),
-                  validator:
-                      (value) => value == null ? "Select a region" : null,
+                  validator: (value) =>
+                      value == null ? "Select a region" : null,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _wifiSsidController,
                   decoration: const InputDecoration(labelText: "Wi-Fi SSID"),
-                  validator:
-                      (value) =>
-                          value == null || value.trim().isEmpty
-                              ? "Enter Wi-Fi SSID"
-                              : null,
+                  validator: (value) =>
+                      value == null || value.trim().isEmpty
+                          ? "Enter Wi-Fi SSID"
+                          : null,
                 ),
                 const SizedBox(height: 12),
                 SizedBox(

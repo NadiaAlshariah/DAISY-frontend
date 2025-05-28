@@ -3,7 +3,7 @@ import 'package:daisy_frontend/services/block_service.dart';
 
 class CreateBlockDialog extends StatefulWidget {
   final String landId;
-  final Map<String, dynamic>? initialData;
+  final Map<String, dynamic>? initialData; 
 
   const CreateBlockDialog({super.key, required this.landId, this.initialData});
 
