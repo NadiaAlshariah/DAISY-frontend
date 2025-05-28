@@ -7,6 +7,9 @@ class CreateLandDialog extends StatefulWidget {
   final String? initialName;
   final double? initialLatitude;
   final double? initialLongitude;
+  final String? initialRegion;
+  final String? initialWifiSsid;
+
   final String title;
   final String confirmText;
 
@@ -15,6 +18,8 @@ class CreateLandDialog extends StatefulWidget {
     this.initialName,
     this.initialLatitude,
     this.initialLongitude,
+    this.initialRegion,
+    this.initialWifiSsid,
     this.title = 'Create New Land',
     this.confirmText = 'Create',
   });
@@ -61,7 +66,11 @@ class _CreateLandDialogState extends State<CreateLandDialog> {
     _lonController = TextEditingController(
       text: widget.initialLongitude?.toString() ?? '',
     );
-    _wifiSsidController = TextEditingController();
+    _wifiSsidController = TextEditingController(
+      text: widget.initialWifiSsid ?? '',
+    );
+
+    selectedRegion = widget.initialRegion;
 
     if (widget.initialLatitude != null && widget.initialLongitude != null) {
       _selectedPosition = LatLng(
@@ -85,7 +94,7 @@ class _CreateLandDialogState extends State<CreateLandDialog> {
 
     try {
       final position = await Geolocator.getCurrentPosition();
-      final LatLng userLocation = LatLng(position.latitude, position.longitude);
+      final userLocation = LatLng(position.latitude, position.longitude);
 
       if (_selectedPosition == null) {
         setState(() {
@@ -130,7 +139,6 @@ class _CreateLandDialogState extends State<CreateLandDialog> {
                               : null,
                 ),
                 const SizedBox(height: 12),
-
                 DropdownButtonFormField<String>(
                   value: selectedRegion,
                   items:
@@ -148,7 +156,6 @@ class _CreateLandDialogState extends State<CreateLandDialog> {
                       (value) => value == null ? "Select a region" : null,
                 ),
                 const SizedBox(height: 12),
-
                 TextFormField(
                   controller: _wifiSsidController,
                   decoration: const InputDecoration(labelText: "Wi-Fi SSID"),
@@ -159,7 +166,6 @@ class _CreateLandDialogState extends State<CreateLandDialog> {
                               : null,
                 ),
                 const SizedBox(height: 12),
-
                 SizedBox(
                   height: 200,
                   child: FlutterMap(
@@ -190,7 +196,6 @@ class _CreateLandDialogState extends State<CreateLandDialog> {
                   ),
                 ),
                 const SizedBox(height: 12),
-
                 ElevatedButton.icon(
                   icon: const Icon(Icons.my_location),
                   label: const Text("Go to My Location"),
@@ -207,7 +212,6 @@ class _CreateLandDialogState extends State<CreateLandDialog> {
                   },
                 ),
                 const SizedBox(height: 12),
-
                 Container(
                   alignment: Alignment.centerLeft,
                   child: Text("Latitude: ${_latController.text}"),

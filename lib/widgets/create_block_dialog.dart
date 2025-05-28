@@ -3,8 +3,9 @@ import 'package:daisy_frontend/services/block_service.dart';
 
 class CreateBlockDialog extends StatefulWidget {
   final String landId;
+  final Map<String, dynamic>? initialData;
 
-  const CreateBlockDialog({super.key, required this.landId});
+  const CreateBlockDialog({super.key, required this.landId, this.initialData});
 
   @override
   State<CreateBlockDialog> createState() => _CreateBlockDialogState();
@@ -24,6 +25,16 @@ class _CreateBlockDialogState extends State<CreateBlockDialog> {
   @override
   void initState() {
     super.initState();
+
+    // Populate form fields if editing
+    final data = widget.initialData;
+    if (data != null) {
+      selectedCropType = data["crop_type"];
+      selectedSensorId = data["sensor_id"];
+      fertilizerUsed = data["fertilizer_uesd"] ?? false;
+      irrigationUsed = data["irrigation_used"] ?? false;
+    }
+
     fetchAvailableSensors();
   }
 
@@ -46,8 +57,10 @@ class _CreateBlockDialogState extends State<CreateBlockDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isEditing = widget.initialData != null;
+
     return AlertDialog(
-      title: const Text("Add New Block"),
+      title: Text(isEditing ? "Edit Block" : "Add New Block"),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -121,7 +134,7 @@ class _CreateBlockDialogState extends State<CreateBlockDialog> {
 
             Navigator.of(context).pop(data);
           },
-          child: const Text("Submit"),
+          child: Text(isEditing ? "Update" : "Submit"),
         ),
       ],
     );
