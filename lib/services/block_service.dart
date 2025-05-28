@@ -71,4 +71,36 @@ class BlockService {
       throw Exception('Error: $error');
     }
   }
+
+  static Future<List<Map<String, dynamic>>> getAvailableSensors(
+    String landId,
+  ) async {
+    final response = await HttpHelper.get('/land/$landId/status/disconnected');
+
+    if (response.statusCode == 200) {
+      final List<dynamic> sensorsJson = jsonDecode(response.body);
+      return sensorsJson.cast<Map<String, dynamic>>();
+    } else {
+      final error = jsonDecode(response.body)['error'] ?? 'Unknown error';
+      throw Exception('Error: $error');
+    }
+  }
+
+  static Future<Map<String, dynamic>?> getLatestYieldPrediction(
+    String blockId,
+    String landId,
+  ) async {
+    final response = await HttpHelper.get(
+      '/lands/$landId/blocks/$blockId/predict-yield',
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } else if (response.statusCode == 404) {
+      return null;
+    } else {
+      final error = jsonDecode(response.body)['error'] ?? 'Unknown error';
+      throw Exception('Error: $error');
+    }
+  }
 }

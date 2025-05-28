@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:daisy_frontend/services/block_service.dart';
 import 'package:daisy_frontend/widgets/create_block_dialog.dart';
+import 'package:daisy_frontend/widgets/block_card.dart';
 
 class BlocksPage extends StatefulWidget {
   final String landId;
@@ -95,22 +96,7 @@ class _BlocksPageState extends State<BlocksPage> {
                   itemCount: blocks.length,
                   itemBuilder: (context, index) {
                     final block = blocks[index];
-                    return Card(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      child: ListTile(
-                        title: Text("Block ID: ${block["id"] ?? "--"}"),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Type: ${block["type"] ?? "N/A"}"),
-                            Text("Area: ${block["area"] ?? "--"} m²"),
-                          ],
-                        ),
-                      ),
-                    );
+                    return BlockCard(block: block);
                   },
                 ),
               ),

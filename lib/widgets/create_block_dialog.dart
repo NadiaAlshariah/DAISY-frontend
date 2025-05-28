@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:daisy_frontend/services/block_service.dart';
 
 class CreateBlockDialog extends StatefulWidget {
   final String landId;
@@ -10,21 +11,38 @@ class CreateBlockDialog extends StatefulWidget {
 }
 
 class _CreateBlockDialogState extends State<CreateBlockDialog> {
-  static const soilTypes = ["sandy", "clay", "loamy", "peaty", "chalky"];
-  static const cropTypes = ["wheat", "corn", "rice", "potato"];
-  static const growthStates = [
-    "seed",
-    "germinating",
-    "vegetative",
-    "budding",
-    "flowering",
-    "ripening",
-    "harvested",
-  ];
+  static const cropTypes = ["Cotton", "Rice", "Wheat", "Corn"];
 
-  String? selectedSoilType;
   String? selectedCropType;
-  String? selectedGrowthState;
+  String? selectedSensorId;
+  bool fertilizerUsed = false;
+  bool irrigationUsed = false;
+
+  List<Map<String, dynamic>> sensors = [];
+  bool isLoadingSensors = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAvailableSensors();
+  }
+
+  Future<void> fetchAvailableSensors() async {
+    try {
+      final fetchedSensors = await BlockService.getAvailableSensors(
+        widget.landId,
+      );
+      setState(() {
+        sensors = fetchedSensors;
+        isLoadingSensors = false;
+      });
+    } catch (e) {
+      setState(() => isLoadingSensors = false);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error fetching sensors: $e")));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,18 +52,6 @@ class _CreateBlockDialogState extends State<CreateBlockDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            DropdownButtonFormField<String>(
-              value: selectedSoilType,
-              items:
-                  soilTypes
-                      .map(
-                        (type) =>
-                            DropdownMenuItem(value: type, child: Text(type)),
-                      )
-                      .toList(),
-              onChanged: (value) => setState(() => selectedSoilType = value),
-              decoration: const InputDecoration(labelText: "Soil Type"),
-            ),
             DropdownButtonFormField<String>(
               value: selectedCropType,
               items:
@@ -58,17 +64,35 @@ class _CreateBlockDialogState extends State<CreateBlockDialog> {
               onChanged: (value) => setState(() => selectedCropType = value),
               decoration: const InputDecoration(labelText: "Crop Type"),
             ),
-            DropdownButtonFormField<String>(
-              value: selectedGrowthState,
-              items:
-                  growthStates
-                      .map(
-                        (state) =>
-                            DropdownMenuItem(value: state, child: Text(state)),
-                      )
-                      .toList(),
-              onChanged: (value) => setState(() => selectedGrowthState = value),
-              decoration: const InputDecoration(labelText: "Growth State"),
+            isLoadingSensors
+                ? const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(),
+                )
+                : DropdownButtonFormField<String>(
+                  value: selectedSensorId,
+                  items:
+                      sensors.map<DropdownMenuItem<String>>((sensor) {
+                        final label =
+                            '${sensor["mac_address"]} - Pin ${sensor["pin"]}';
+                        return DropdownMenuItem<String>(
+                          value: sensor["id"] as String,
+                          child: Text(label),
+                        );
+                      }).toList(),
+                  onChanged:
+                      (value) => setState(() => selectedSensorId = value),
+                  decoration: const InputDecoration(labelText: "Sensor"),
+                ),
+            SwitchListTile(
+              title: const Text("Fertilizer Used"),
+              value: fertilizerUsed,
+              onChanged: (value) => setState(() => fertilizerUsed = value),
+            ),
+            SwitchListTile(
+              title: const Text("Irrigation Used"),
+              value: irrigationUsed,
+              onChanged: (value) => setState(() => irrigationUsed = value),
             ),
           ],
         ),
@@ -80,23 +104,19 @@ class _CreateBlockDialogState extends State<CreateBlockDialog> {
         ),
         ElevatedButton(
           onPressed: () {
-            if (selectedSoilType == null ||
-                selectedCropType == null ||
-                selectedGrowthState == null) {
+            if (selectedCropType == null) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Please select all dropdown values"),
-                ),
+                const SnackBar(content: Text("Please select crop type")),
               );
               return;
             }
 
             final data = {
               "land_id": widget.landId,
-              "soil_type": selectedSoilType,
               "crop_type": selectedCropType,
-              "growth_state": selectedGrowthState,
-              "planted_at": DateTime.now().toIso8601String(),
+              "fertilizer_uesd": fertilizerUsed,
+              "irrigation_used": irrigationUsed,
+              if (selectedSensorId != null) "sensor_id": selectedSensorId,
             };
 
             Navigator.of(context).pop(data);

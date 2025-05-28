@@ -14,15 +14,8 @@ class LandsService {
     }
   }
 
-  static Future<void> createLand({
-    required String name,
-    required double latitude,
-    required double longitude,
-  }) async {
-    final response = await HttpHelper.post(
-      '/lands/create',
-      body: {'name': name, 'latitude': latitude, 'longitude': longitude},
-    );
+  static Future<void> createLand(Map<String, dynamic> data) async {
+    final response = await HttpHelper.post('/lands/create', body: data);
 
     if (response.statusCode != 201) {
       final error = jsonDecode(response.body)['error'];

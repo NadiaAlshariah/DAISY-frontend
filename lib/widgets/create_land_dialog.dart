@@ -28,8 +28,28 @@ class _CreateLandDialogState extends State<CreateLandDialog> {
   late TextEditingController _nameController;
   late TextEditingController _latController;
   late TextEditingController _lonController;
+  late TextEditingController _wifiSsidController;
+  String? selectedRegion;
+
   LatLng? _selectedPosition;
   final MapController _mapController = MapController();
+
+  static const regionOptions = [
+    "Desert",
+    "Drylands",
+    "Sahara",
+    "Steppe",
+    "Semi Dry",
+    "Plateau",
+    "Forest",
+    "Grassland",
+    "Tropical",
+    "Coastal",
+    "Rainforest",
+    "Wetland",
+    "River Basin",
+    "Mountain",
+  ];
 
   @override
   void initState() {
@@ -41,6 +61,7 @@ class _CreateLandDialogState extends State<CreateLandDialog> {
     _lonController = TextEditingController(
       text: widget.initialLongitude?.toString() ?? '',
     );
+    _wifiSsidController = TextEditingController();
 
     if (widget.initialLatitude != null && widget.initialLongitude != null) {
       _selectedPosition = LatLng(
@@ -53,22 +74,20 @@ class _CreateLandDialogState extends State<CreateLandDialog> {
   }
 
   Future<void> _initLocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) return;
+    if (!await Geolocator.isLocationServiceEnabled()) return;
 
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) return;
     }
-
     if (permission == LocationPermission.deniedForever) return;
 
     try {
       final position = await Geolocator.getCurrentPosition();
       final LatLng userLocation = LatLng(position.latitude, position.longitude);
 
-      if (widget.initialLatitude == null || widget.initialLongitude == null) {
+      if (_selectedPosition == null) {
         setState(() {
           _selectedPosition = userLocation;
           _latController.text = userLocation.latitude.toString();
@@ -106,9 +125,41 @@ class _CreateLandDialogState extends State<CreateLandDialog> {
                   decoration: const InputDecoration(labelText: "Land Name"),
                   validator:
                       (value) =>
-                          value == null || value.isEmpty ? 'Enter name' : null,
+                          value == null || value.isEmpty
+                              ? 'Enter land name'
+                              : null,
                 ),
                 const SizedBox(height: 12),
+
+                DropdownButtonFormField<String>(
+                  value: selectedRegion,
+                  items:
+                      regionOptions
+                          .map(
+                            (region) => DropdownMenuItem(
+                              value: region,
+                              child: Text(region),
+                            ),
+                          )
+                          .toList(),
+                  onChanged: (value) => setState(() => selectedRegion = value),
+                  decoration: const InputDecoration(labelText: "Region"),
+                  validator:
+                      (value) => value == null ? "Select a region" : null,
+                ),
+                const SizedBox(height: 12),
+
+                TextFormField(
+                  controller: _wifiSsidController,
+                  decoration: const InputDecoration(labelText: "Wi-Fi SSID"),
+                  validator:
+                      (value) =>
+                          value == null || value.trim().isEmpty
+                              ? "Enter Wi-Fi SSID"
+                              : null,
+                ),
+                const SizedBox(height: 12),
+
                 SizedBox(
                   height: 200,
                   child: FlutterMap(
@@ -139,6 +190,7 @@ class _CreateLandDialogState extends State<CreateLandDialog> {
                   ),
                 ),
                 const SizedBox(height: 12),
+
                 ElevatedButton.icon(
                   icon: const Icon(Icons.my_location),
                   label: const Text("Go to My Location"),
@@ -155,6 +207,7 @@ class _CreateLandDialogState extends State<CreateLandDialog> {
                   },
                 ),
                 const SizedBox(height: 12),
+
                 Container(
                   alignment: Alignment.centerLeft,
                   child: Text("Latitude: ${_latController.text}"),
@@ -180,6 +233,8 @@ class _CreateLandDialogState extends State<CreateLandDialog> {
                 'name': _nameController.text.trim(),
                 'latitude': double.parse(_latController.text),
                 'longitude': double.parse(_lonController.text),
+                'region': selectedRegion!.trim().toLowerCase(),
+                'wifi_ssid': _wifiSsidController.text.trim(),
               };
               Navigator.pop(context, data);
             }

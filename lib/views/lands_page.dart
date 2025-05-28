@@ -33,11 +33,8 @@ class _LandsPageState extends State<LandsPage> {
 
     if (result != null) {
       try {
-        await LandsService.createLand(
-          name: result['name'],
-          latitude: result['latitude'],
-          longitude: result['longitude'],
-        );
+        // ✅ Send the full map directly
+        await LandsService.createLand(result);
         _loadLands();
       } catch (e) {
         if (!mounted) return;
