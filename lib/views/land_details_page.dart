@@ -128,14 +128,11 @@ class LandDetailsPage extends StatelessWidget {
             initialName: land['name'],
             initialLatitude: land['latitude'],
             initialLongitude: land['longitude'],
-            initialRegion:
-                land['region'] != null
-                    ? land['region']
-                        .toString()
-                        .split(' ')
-                        .map((w) => '${w[0].toUpperCase()}${w.substring(1)}')
-                        .join(' ')
-                    : null,
+            initialRegion: land['region']
+                ?.toString()
+                .split(' ')
+                .map((w) => '${w[0].toUpperCase()}${w.substring(1)}')
+                .join(' '),
             initialWifiSsid: land['wifi_ssid'],
             title: 'Edit Land',
             confirmText: 'Save',

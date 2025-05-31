@@ -115,7 +115,7 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  ...lands.take(3).map((land) => LandCard(land: land)).toList(),
+                  ...lands.take(3).map((land) => LandCard(land: land)),
                   const SizedBox(height: 32),
                   const CropPieChart(),
                 ],

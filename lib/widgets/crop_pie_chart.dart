@@ -145,7 +145,7 @@ class _CropPieChartState extends State<CropPieChart> {
                           ],
                         ),
                       );
-                    }).toList(),
+                    }),
                   ],
                 ),
               ),
