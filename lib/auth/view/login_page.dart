@@ -30,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       await AuthService.login(email, password);
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
     } catch (e) {
       setState(() {
         errorMessage = e.toString().replaceFirst('Exception: ', '');

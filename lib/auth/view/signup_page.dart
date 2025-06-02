@@ -35,7 +35,7 @@ class _SignupPageState extends State<SignupPage> {
         confirmPassword: confirmPasswordController.text,
       );
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
     } catch (e) {
       setState(() {
         errorMessage = e.toString().replaceFirst('error: ', '');
@@ -143,7 +143,7 @@ class _SignupPageState extends State<SignupPage> {
                   const Text('Already have an account?'),
                   TextButton(
                     onPressed:
-                        () => Navigator.push(
+                        () => Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
                             builder: (context) => const LoginPage(),
