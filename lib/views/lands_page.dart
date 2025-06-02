@@ -33,7 +33,7 @@ class _LandsPageState extends State<LandsPage> {
 
     if (result != null) {
       try {
-        // ✅ Send the full map directly
+        // Send the full map directly
         await LandsService.createLand(result);
         _loadLands();
       } catch (e) {

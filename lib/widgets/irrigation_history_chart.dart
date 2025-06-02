@@ -107,7 +107,7 @@ class IrrigationPredictionChart extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Latest Prediction: ${latest!['water_requirement'] ?? '--'} liters",
+                "Latest Prediction: ${latest!['water_requirement'] ?? '--'} mm",
                 style: const TextStyle(fontWeight: FontWeight.w500),
               ),
               Text(

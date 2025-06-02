@@ -40,20 +40,20 @@ class _CreateLandDialogState extends State<CreateLandDialog> {
   final MapController _mapController = MapController();
 
   static const regionOptions = [
-    "Desert",
-    "Drylands",
-    "Sahara",
-    "Steppe",
-    "Semi Dry",
-    "Plateau",
-    "Forest",
-    "Grassland",
-    "Tropical",
-    "Coastal",
-    "Rainforest",
-    "Wetland",
-    "River Basin",
-    "Mountain",
+    "desert",
+    "drylands",
+    "sahara",
+    "steppe",
+    "semi Dry",
+    "plateau",
+    "forest",
+    "grassland",
+    "tropical",
+    "coastal",
+    "rainforest",
+    "wetland",
+    "river Basin",
+    "mountain",
   ];
 
   @override

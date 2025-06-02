@@ -38,7 +38,7 @@ class _SignupPageState extends State<SignupPage> {
       Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
       setState(() {
-        errorMessage = e.toString().replaceFirst('Exception: ', '');
+        errorMessage = e.toString().replaceFirst('error: ', '');
       });
     } finally {
       setState(() {

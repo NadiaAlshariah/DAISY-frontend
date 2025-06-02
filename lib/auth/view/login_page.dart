@@ -96,19 +96,7 @@ class _LoginPageState extends State<LoginPage> {
                 icon: Icons.lock,
               ),
 
-              const SizedBox(height: 8.0),
-              Center(
-                child: TextButton(
-                  onPressed: () {},
-                  child: Text(
-                    'Forgot Password?',
-                    style: TextStyle(
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
+              const SizedBox(height: 32.0),
 
               SizedBox(
                 height: 56.0,

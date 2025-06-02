@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:daisy_frontend/auth/service/auth_service.dart';
 
 class HttpHelper {
-  static const String baseUrl = 'http://192.168.1.12:5000';
+  static const String baseUrl = 'https://daisy-backend-wk3f.onrender.com';
 
   static Future<http.Response> get(String endpoint) async {
     final token = await AuthService.getToken();

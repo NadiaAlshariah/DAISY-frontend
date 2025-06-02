@@ -230,11 +230,7 @@ class _LandDetailsPageState extends State<LandDetailsPage> {
           ).showSnackBar(const SnackBar(content: Text('Land updated')));
         }
       } catch (e) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Edit failed: $e')));
-        }
+        print(e);
       }
     }
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppLightTheme {
-  static const Color primaryGreen = Color(0xFF2E875C); // muted leafy green
+  static const Color primaryGreen = Color(0xff2e875c); // muted leafy green
   static const Color secondaryGreen = Color(0xFFA8D5BA); // soft mint green
   static const Color background = Color(0xFFF7FBF4); // gentle herb cream
   static const Color cardColor = Color(0xFFE4F0E4); // subtle greenish white
