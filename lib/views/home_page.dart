@@ -1,10 +1,12 @@
-import 'package:daisy_frontend/widgets/crop_pie_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:daisy_frontend/auth/service/auth_service.dart';
 import 'package:daisy_frontend/services/lands_service.dart';
 import 'package:daisy_frontend/views/lands_page.dart';
-import 'package:daisy_frontend/widgets/land_card.dart';
 import 'package:daisy_frontend/views/settings/settings_page.dart';
+import 'package:daisy_frontend/widgets/land_card.dart';
+import 'package:daisy_frontend/widgets/crop_pie_chart.dart';
+import 'package:daisy_frontend/widgets/yield_prediciton.dart';
+import 'package:daisy_frontend/widgets/water_summary_card.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,12 +18,15 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String? username;
   late Future<List<Map<String, dynamic>>> _landsFuture;
+  late Future<List<Map<String, dynamic>>> _userPredictionsFuture;
+  Map<String, dynamic>? waterSummary;
+  bool loadingWaterSummary = true;
 
   @override
   void initState() {
     super.initState();
     _loadUsername();
-    _refreshLands();
+    _refreshData();
   }
 
   void _loadUsername() async {
@@ -31,11 +36,24 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Future<void> _refreshLands() async {
+  Future<void> _refreshData() async {
     setState(() {
       _landsFuture = LandsService.getUserLands();
+      _userPredictionsFuture = LandsService.getLatestYieldPredictionsForUser();
+      loadingWaterSummary = true;
     });
-    await _landsFuture;
+
+    try {
+      final summary = await LandsService.getWaterSummaryForUser();
+      setState(() {
+        waterSummary = summary;
+        loadingWaterSummary = false;
+      });
+    } catch (e) {
+      setState(() => loadingWaterSummary = false);
+    }
+
+    await Future.wait([_landsFuture, _userPredictionsFuture]);
   }
 
   @override
@@ -71,7 +89,7 @@ class _HomePageState extends State<HomePage> {
           final lands = snapshot.data ?? [];
 
           return RefreshIndicator(
-            onRefresh: _refreshLands,
+            onRefresh: _refreshData,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(16),
@@ -107,7 +125,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           );
                           if (result == true) {
-                            await _refreshLands();
+                            await _refreshData();
                           }
                         },
                         child: const Text('View All'),
@@ -116,6 +134,44 @@ class _HomePageState extends State<HomePage> {
                   ),
                   const SizedBox(height: 12),
                   ...lands.take(3).map((land) => LandCard(land: land)).toList(),
+
+                  const SizedBox(height: 24),
+                  const Text(
+                    'Your Yield Prediction Summary',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 12),
+                  FutureBuilder<List<Map<String, dynamic>>>(
+                    future: _userPredictionsFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      if (snapshot.hasError) {
+                        return Text('Prediction Error: ${snapshot.error}');
+                      }
+
+                      final predictions = snapshot.data ?? [];
+                      return YieldPredictionCard(
+                        predictions: predictions,
+                        isLoading: false,
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 24),
+                  const Text(
+                    'Your Irrigation Summary',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 12),
+                  loadingWaterSummary
+                      ? const Center(child: CircularProgressIndicator())
+                      : waterSummary == null
+                      ? const Text("No irrigation data found.")
+                      : WaterSummaryCard(summary: waterSummary!),
+
                   const SizedBox(height: 32),
                   const CropPieChart(),
                 ],

@@ -103,4 +103,39 @@ class BlockService {
       throw Exception('Error: $error');
     }
   }
+
+  static Future<Map<String, dynamic>?> getLatestIrrigationPrediction(
+    String landId,
+    String blockId,
+  ) async {
+    final response = await HttpHelper.get(
+      '/lands/$landId/blocks/$blockId/irrigation-predict',
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } else if (response.statusCode == 404) {
+      return null;
+    } else {
+      final error = jsonDecode(response.body)['error'] ?? 'Unknown error';
+      throw Exception('Error: $error');
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getIrrigationPredictionHistory(
+    String landId,
+    String blockId,
+  ) async {
+    final response = await HttpHelper.get(
+      '/lands/$landId/blocks/$blockId/irrigation-predict-history',
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((e) => e as Map<String, dynamic>).toList();
+    } else {
+      final error = jsonDecode(response.body)['error'] ?? 'Unknown error';
+      throw Exception('Error: $error');
+    }
+  }
 }

@@ -50,4 +50,59 @@ class LandsService {
       throw Exception('Failed to fetch weather data');
     }
   }
+
+  static Future<List<Map<String, dynamic>>> getLatestYieldPredictionsForLand(
+    String landId,
+  ) async {
+    final response = await HttpHelper.get('/lands/$landId/predict-yield');
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = jsonDecode(response.body);
+      return jsonData.cast<Map<String, dynamic>>();
+    } else if (response.statusCode == 404) {
+      return [];
+    } else {
+      final error = jsonDecode(response.body)['error'] ?? 'Unknown error';
+      throw Exception('Error: $error');
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>>
+  getLatestYieldPredictionsForUser() async {
+    final response = await HttpHelper.get('/lands/user/predict-yield');
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = jsonDecode(response.body);
+      return jsonData.cast<Map<String, dynamic>>();
+    } else if (response.statusCode == 404) {
+      return [];
+    } else {
+      final error = jsonDecode(response.body)['error'] ?? 'Unknown error';
+      throw Exception('Error: $error');
+    }
+  }
+
+  static Future<Map<String, dynamic>> getWaterSummaryForLand(
+    String landId,
+  ) async {
+    final response = await HttpHelper.get('/lands/$landId/water-summary');
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } else {
+      final error = jsonDecode(response.body)['error'] ?? 'Unknown error';
+      throw Exception('Failed to fetch land water summary: $error');
+    }
+  }
+
+  static Future<Map<String, dynamic>> getWaterSummaryForUser() async {
+    final response = await HttpHelper.get('/lands/user/water-summary');
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } else {
+      final error = jsonDecode(response.body)['error'] ?? 'Unknown error';
+      throw Exception('Failed to fetch user water summary: $error');
+    }
+  }
 }

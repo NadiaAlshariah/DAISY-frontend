@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:daisy_frontend/services/block_service.dart';
+import 'package:daisy_frontend/widgets/yield_prediciton.dart';
+import 'package:daisy_frontend/widgets/irrigation_history_chart.dart';
 
 class BlockDetailsPage extends StatefulWidget {
   final Map<String, dynamic> block;
@@ -13,11 +15,41 @@ class BlockDetailsPage extends StatefulWidget {
 class _BlockDetailsPageState extends State<BlockDetailsPage> {
   Map<String, dynamic>? yieldPrediction;
   bool loadingPrediction = true;
+  List<Map<String, dynamic>> irrigationHistory = [];
+  Map<String, dynamic>? latestIrrigation;
+  bool loadingIrrigation = true;
 
   @override
   void initState() {
     super.initState();
     fetchYieldPrediction();
+    fetchIrrigationData();
+  }
+
+  Future<void> fetchIrrigationData() async {
+    try {
+      final latest = await BlockService.getLatestIrrigationPrediction(
+        widget.block['land_id'],
+        widget.block['id'],
+      );
+
+      final history = await BlockService.getIrrigationPredictionHistory(
+        widget.block['land_id'],
+        widget.block['id'],
+      );
+
+      setState(() {
+        latestIrrigation = latest;
+        irrigationHistory = history;
+        loadingIrrigation = false;
+        print(history);
+      });
+    } catch (e) {
+      setState(() => loadingIrrigation = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to load irrigation data: $e")),
+      );
+    }
   }
 
   Future<void> fetchYieldPrediction() async {
@@ -64,40 +96,21 @@ class _BlockDetailsPageState extends State<BlockDetailsPage> {
             const SizedBox(height: 12),
             _buildIconRow("Sensor ID", sensorId, Icons.sensors),
             const SizedBox(height: 20),
-            _buildYieldPredictionCard(),
-          ],
-        ),
-      ),
-    );
-  }
 
-  Widget _buildYieldPredictionCard() {
-    if (loadingPrediction) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (yieldPrediction == null) {
-      return const Text("No yield prediction available.");
-    }
-
-    final yieldTons = yieldPrediction!['yield_tons_per_hectare'];
-    final kgPerM2 =
-        yieldTons != null ? (yieldTons * 0.1).toStringAsFixed(3) : '--';
-
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Yield Prediction",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            YieldPredictionCard(
+              predictions: yieldPrediction != null ? [yieldPrediction!] : [],
+              isLoading: loadingPrediction,
             ),
-            const SizedBox(height: 8),
-            Text("Tons per Hectare: $yieldTons"),
-            Text("Kg per m²: $kgPerM2"),
+
+            const SizedBox(height: 20),
+            if (loadingIrrigation)
+              const Center(child: CircularProgressIndicator())
+            else
+              IrrigationPredictionChart(
+                history: irrigationHistory,
+                latest: latestIrrigation,
+                title: "Irrigation Prediction History",
+              ),
           ],
         ),
       ),
@@ -105,14 +118,7 @@ class _BlockDetailsPageState extends State<BlockDetailsPage> {
   }
 
   Widget _buildIconRow(String title, dynamic value, IconData icon) {
-    String displayValue;
-    if (value is String) {
-      displayValue = value;
-    } else if (value is Map && value.containsKey('value')) {
-      displayValue = value['value'].toString();
-    } else {
-      displayValue = value?.toString() ?? '--';
-    }
+    final displayValue = _formatValue(value);
 
     return Row(
       children: [
@@ -205,10 +211,15 @@ class _BlockDetailsPageState extends State<BlockDetailsPage> {
     );
   }
 
-  String _safeEnum(dynamic value) {
+  String _formatValue(dynamic value) {
     if (value is String) return value;
-    if (value is Map && value.containsKey('value')) return value['value'];
-    return 'N/A';
+    if (value is Map && value.containsKey('value'))
+      return value['value'].toString();
+    return value?.toString() ?? '--';
+  }
+
+  String _safeEnum(dynamic value) {
+    return _formatValue(value);
   }
 
   String _formatDate(dynamic value) {

@@ -160,11 +160,6 @@ class _CropPieChartState extends State<CropPieChart> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Crop Distribution',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 16),
         PieChart(
           dataMap: const {"No Data": 1},
           colorList: [Colors.grey.shade300],
